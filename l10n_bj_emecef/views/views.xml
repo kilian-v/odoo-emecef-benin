@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_emecef" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.emecef</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_send_emecef"
+                        string="Normaliser la facture"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="state != 'posted' or is_normalized == True or move_type not in ('out_invoice', 'out_refund')"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="e-MECeF Bénin" invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <group>
+                        <group string="Informations de Sécurité">
+                            <field name="is_normalized"/>
+                            <field name="emecef_code"/>
+                            <field name="emecef_datetime"/>
+                        </group>
+                        <group string="Détails Techniques">
+                            <field name="emecef_uid"/>
+                            <field name="emecef_counters"/>
+                            <field name="emecef_qr_code"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

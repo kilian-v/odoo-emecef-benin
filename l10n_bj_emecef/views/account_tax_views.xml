@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tax_form_inherit_emecef" model="ir.ui.view">
+        <field name="name">account.tax.form.inherit.emecef</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='advanced_options']" position="inside">
+                <group string="Configuration e-MECeF Bénin">
+                    <field name="emecef_tax_group"/>
+                    <field name="emecef_aib_group"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

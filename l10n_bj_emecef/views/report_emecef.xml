@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_emecef_invoice" model="ir.actions.report">
+        <field name="name">Facture e-MECeF</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_bj_emecef.report_emecef_template</field>
+        <field name="report_file">l10n_bj_emecef.report_emecef_template</field>
+        <field name="print_report_name">'Facture e-MECeF - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_emecef_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #000;">
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong style="font-size: 1.3em; text-transform: uppercase;"><t t-esc="o.company_id.name"/></strong><br/>
+                                <span>IFU : <t t-esc="o.company_id.emecef_ifu"/></span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong style="font-size: 1.3em; text-transform: uppercase;">
+                                    <t t-if="o.move_type == 'out_invoice'">FACTURE DE VENTE</t>
+                                    <t t-if="o.move_type == 'out_refund'">FACTURE D'AVOIR</t>
+                                </strong><br/>
+                                Facture # <t t-esc="o.name"/><br/>
+                                Date: <t t-esc="o.invoice_date.strftime('%d/%m/%Y') if o.invoice_date else ''"/><br/>
+                                Vendeur: <t t-esc="o.user_id.name"/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-6" style="padding-right: 15px;">
+                                <div style="border: 1px solid #d3d3d3; height: 100%; border-radius: 2px;">
+                                    <div style="padding: 10px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="font-style: italic; width: 30%; font-weight: 300;">Adresse</td>
+                                                <td><t t-esc="o.company_id.street"/>, <t t-esc="o.company_id.city"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-style: italic; font-weight: 300;">Contact</td>
+                                                <td><t t-esc="o.company_id.phone"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-style: italic; font-weight: 300;">VMCF</td>
+                                                <td><t t-esc="o.company_id.emecef_nim"/></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6" style="padding-left: 15px;">
+                                <div style="border: 1px solid #d3d3d3; height: 100%; border-radius: 2px;">
+                                    <div style="background-color: #4a4a4a; color: #ffffff; padding: 4px 10px; font-weight: bold; text-transform: uppercase;">
+                                        CLIENT
+                                    </div>
+                                    <div style="padding: 10px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="font-style: italic; width: 30%; font-weight: 300;">Nom</td>
+                                                <td><t t-esc="o.partner_id.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-style: italic; font-weight: 300;">IFU</td>
+                                                <td><t t-esc="o.partner_id.vat or ''"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-style: italic; font-weight: 300;">Adresse</td>
+                                                <td><t t-esc="o.partner_id.street"/> <t t-esc="o.partner_id.city"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-style: italic; font-weight: 300;">Contact</td>
+                                                <td><t t-esc="o.partner_id.phone"/></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm mb-4" style="width: 100%;">
+                            <thead style="background-color: #deedfd;">
+                                <tr>
+                                    <th style="font-weight: bold; border-bottom: 1px solid #ccc;">#</th>
+                                    <th style="font-weight: bold; border-bottom: 1px solid #ccc;">Nom</th>
+                                    <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Prix unitaire</th>
+                                    <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Quantité</th>
+                                    <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Montant T.T.C.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="line_count" t-value="1"/>
+                                <tr t-foreach="o.invoice_line_ids.filtered(lambda l: l.display_type == 'product')" t-as="line">
+                                    <td style="border-bottom: 1px solid #eee;"><t t-esc="line_count"/></td>
+                                    <td style="border-bottom: 1px solid #eee;"><t t-esc="line.name"/></td>
+                                    <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="'{:,}'.format(int(line.price_unit)).replace(',', '.')"/></td>
+                                    <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="line.quantity"/></td>
+                                    <td class="text-end" style="border-bottom: 1px solid #eee;">
+                                        <t t-esc="'{:,}'.format(int(line.price_total)).replace(',', '.')"/>
+                                        [<t t-esc="line.tax_ids[:1].emecef_tax_group if line.tax_ids else 'A'"/>]
+                                    </td>
+                                    <t t-set="line_count" t-value="line_count + 1"/>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row mb-4">
+                            <div class="col-7">
+                                <div class="text-center mb-1"><i style="color: #555;">--- VENTILATION DES IMPÔTS ---</i></div>
+                                <table class="table table-sm">
+                                    <thead style="background-color: #deedfd;">
+                                        <tr>
+                                            <th style="font-weight: bold; border-bottom: 1px solid #ccc;">Groupe</th>
+                                            <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Total</th>
+                                            <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Imposable</th>
+                                            <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Impôt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="border-bottom: 1px solid #eee;">TOTAL</td>
+                                            <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="'{:,}'.format(int(o.amount_total)).replace(',', '.')"/></td>
+                                            <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="'{:,}'.format(int(o.amount_untaxed)).replace(',', '.')"/></td>
+                                            <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="'{:,}'.format(int(o.amount_tax)).replace(',', '.')"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col-4 offset-1 text-end">
+                                <div style="border-top: 3px solid #000; border-bottom: 3px solid #000; padding: 15px 0; margin-top: 20px;">
+                                    <strong style="font-size: 1.5em; letter-spacing: 1.5px;">Total: <t t-esc="'{:,}'.format(int(o.amount_total)).replace(',', '.')"/></strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-7">
+                                <div class="text-center mb-1"><i style="color: #555;">--- RÉPARTITION DES PAIEMENTS ---</i></div>
+                                <table class="table table-sm">
+                                    <thead style="background-color: #deedfd;">
+                                        <tr>
+                                            <th style="font-weight: bold; border-bottom: 1px solid #ccc;">Type de paiement</th>
+                                            <th class="text-end" style="font-weight: bold; border-bottom: 1px solid #ccc;">Payé</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="border-bottom: 1px solid #eee;"><t t-esc="'NON PAYÉ' if o.payment_state == 'not_paid' else 'RÉGLÉ'"/></td>
+                                            <td class="text-end" style="border-bottom: 1px solid #eee;"><t t-esc="'{:,}'.format(int(o.amount_total - o.amount_residual)).replace(',', '.')"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 10px; margin-bottom: 20px;">
+                            Arrêté la présente facture à la somme de <t t-esc="o.currency_id.amount_to_text(o.amount_total)"/> TTC.<br/>
+                            Cette facture a été générée via Odoo - e-MECeF SFE.
+                        </div>
+
+                        <t t-if="o.is_normalized">
+                            <div class="text-center mb-1"><i style="color: #888;">--- ÉLÉMENTS DE SÉCURITÉ DE LA FACTURE NORMALISÉE ---</i></div>
+                            <div style="border: 2px solid #87CEEB; padding: 15px; border-radius: 4px; page-break-inside: avoid;">
+                                <div class="row align-items-center">
+
+                                    <div class="col-4 text-center">
+                                        <t t-if="o.emecef_qr_code">
+                                            <span t-field="o.emecef_qr_code" t-options="{'widget': 'barcode', 'symbology': 'QR', 'width': 140, 'height': 140}"/>
+                                        </t>
+                                    </div>
+
+                                    <div class="col-8">
+                                        <div style="font-size: 0.9em; margin-bottom: 2px;">Code MECeF/DGI</div>
+                                        <div style="font-weight: bold; font-size: 1.3em; margin-bottom: 15px; letter-spacing: 1px;">
+                                            <t t-esc="o.emecef_code"/>
+                                        </div>
+
+                                        <table style="width: 100%; font-size: 0.9em;">
+                                            <tr>
+                                                <td style="width: 40%;">MECeF NIM:</td>
+                                                <td class="text-end" style="font-weight: bold;"><t t-esc="o.company_id.emecef_nim"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>MECeF Compteurs:</td>
+                                                <td class="text-end" style="font-weight: bold;"><t t-esc="o.emecef_counters"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>MECeF Heure:</td>
+                                                <td class="text-end" style="font-weight: bold;">
+                                                    <t t-esc="o.emecef_datetime.strftime('%d/%m/%Y %H:%M:%S') if o.emecef_datetime else ''"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

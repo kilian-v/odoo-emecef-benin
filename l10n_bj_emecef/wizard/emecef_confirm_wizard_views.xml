@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_emecef_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">emecef.confirm.wizard.form</field>
+        <field name="model">emecef.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation des totaux retournés par l'e-MECeF">
+                <sheet>
+                    <group>
+                        <field name="move_id" invisible="1"/>
+                        <field name="tax_a"/>
+                        <field name="tax_b"/>
+                        <field name="tax_c"/>
+                        <field name="tax_d"/>
+                        <field name="tax_e"/>
+                        <field name="tax_f"/>
+                        <field name="aib"/>
+                        <field name="total_general" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Confirmer" name="action_confirm_api" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
