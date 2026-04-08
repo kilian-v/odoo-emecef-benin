@@ -16,7 +16,7 @@
         - Gestion de la ventilation des taxes (A, B, C, D, E, F) et de l'AIB
     """,
 
-    'author': "Kilian VITOU - Cashless Africa",
+    'author': "KV - Cashless Africa",
     'website': "https://cashless.africa",
     'maintainer': 'Cashless Africa',
 
